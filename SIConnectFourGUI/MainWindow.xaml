@@ -5,12 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SIConnectFourGUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="386.458" Width="525">
+        Title="MainWindow" Height="445.791" Width="453.667">
     <Grid>
-        <GroupBox Header="Game board&#xD;&#xA;" HorizontalAlignment="Left" Height="292" VerticalAlignment="Top" Width="517">
-            <Grid x:Name="Grid_GameBoard" Loaded="Grid_GameBoard_Loaded" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+
+        <GroupBox Header="Menu" HorizontalAlignment="Left" Height="108" Margin="0,297,0,0" VerticalAlignment="Top" Width="446">
+            <Label Content="vs Computer (P2)" HorizontalAlignment="Left" Height="26" Margin="134,3,0,0" VerticalAlignment="Top" Width="142"/>
         </GroupBox>
-        <GroupBox Header="Menu" HorizontalAlignment="Left" Height="58" Margin="0,297,0,0" VerticalAlignment="Top" Width="517"/>
+
+        <GroupBox Header="Game board&#xA;" HorizontalAlignment="Left" Height="292" VerticalAlignment="Top" Width="446">
+            <Grid x:Name="Grid_GameBoard" Loaded="Grid_GameBoard_Loaded" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" IsEnabled="False" Margin="0,0,-2,0"/>
+        </GroupBox>
+        <ComboBox x:Name="cbPlayType" HorizontalAlignment="Left" Margin="8,318,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="1.933,0.588" >
+            <ComboBoxItem Content="Aga"/>
+            <ComboBoxItem Content="Computer"/>
+        </ComboBox>
+        <Button Content="Graj" HorizontalAlignment="Left" Margin="345,318,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+        <ComboBox x:Name="cbP1H" HorizontalAlignment="Left" Margin="10,353,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="1.933,0.588" SelectedIndex="0" >
+            <ComboBoxItem Content="Pierwsza Heurystyka"/>
+            <ComboBoxItem Content="Druga Heurystyka"/>
+            <ComboBoxItem Content="Trzecia"/>
+        </ComboBox>
+        <ComboBox x:Name="cbP2H" HorizontalAlignment="Left" Margin="159,353,0,0" VerticalAlignment="Top" Width="120" RenderTransformOrigin="1.933,0.588" SelectedIndex="0" >
+            <ComboBoxItem Content="Pierwsza Heurystyka"/>
+            <ComboBoxItem Content="Druga Heurystyka"/>
+            <ComboBoxItem Content="Trzecia"/>
+        </ComboBox>
 
     </Grid>
 </Window>

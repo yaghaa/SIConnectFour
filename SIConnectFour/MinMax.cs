@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace SIConnectFour
 {
@@ -35,14 +36,16 @@ namespace SIConnectFour
 
 
             AlphaBeta2(bs, lookAhead, int.MinValue, int.MaxValue, !player, out bestMoveIndex);
+
             return bestMoveIndex;
         }
 
         private static int AlphaBeta2(GameBoard bs, int depth, int alpha, int beta, bool maxPlayer, out int bestMove)
         {
-            bestMove = -1;
-
             List<int> moves = bs.GetAvailableMoves();
+            bestMove = moves.First();
+
+            
             if (depth == 0 || bs.Player1ExistingAnswers > 0
                 || bs.Player2ExistingAnswers > 0 || moves.Count == 0)
             {

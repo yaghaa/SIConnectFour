@@ -16,6 +16,8 @@ namespace SIConnectFour
         private int _estimation;
         private int _p1ExistingAnswers;
         private int _p2ExistingAnswers;
+        public int _p1H;
+        public int _p2H;
 
         public delegate void MoveHandler(Position pos, bool player);
         public event MoveHandler PlayerMoved;
@@ -29,7 +31,6 @@ namespace SIConnectFour
         public int Estimation => _estimation;
 
         public int LastMove => _lastMove;
-
 
         public List<int> GetAvailableMoves()
         {
@@ -97,23 +98,83 @@ namespace SIConnectFour
             {
                 for (int row = Constant.ROWSIZE - 1; row >= 0; row--)
                 {
-                    sbyte color = _board[row][col];
-                    if (color == 0) break;
-                    else if (color == 1)
+                    #region FirstHeuristic
+                    if((Player == Player.P1 && _p1H==0) || (Player == Player.P2 && _p2H == 0))
                     {
-                        var rating = new Rating(_board);
-                        rating.FeedRating(row,col,color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
-                        
-                        p1Score += rating.CalculateRating();
-                        p1ExistingAnswers = rating.GetExistingAnswers();
+                        sbyte color = _board[row][col];
+                        if (color == 0) break;
+                        else if (color == 1)
+                        {
+                            var rating = new Rating(_board);
+                            rating.FeedRating(row, col, color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
+
+                            p1Score += rating.CalculateRating();
+                            p1ExistingAnswers += rating.GetExistingAnswers();
+                        }
+                        else if (color == 2)
+                        {
+                            var rating = new Rating(_board);
+                            rating.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
+
+                            p2Score += rating.CalculateRating();
+                            p2ExistingAnswers += rating.GetExistingAnswers();
+                        }
+                        #endregion
                     }
-                    else if (color == 2)
+                    else if ((Player == Player.P1 && _p1H == 1) || (Player == Player.P2 && _p2H == 1))
                     {
-                        var rating = new Rating(_board);
-                        rating.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
-                        
-                        p2Score += rating.CalculateRating();
-                        p2ExistingAnswers = rating.GetExistingAnswers();
+                        #region SecondHeuristic
+                        sbyte color = _board[row][col];
+                        if (color == 0) break;
+                        else if (color == 1)
+                        {
+                            var rating = new Rating(_board);
+                            rating.FeedRating(row, col, color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
+                            p1ExistingAnswers += rating.GetExistingAnswers();
+
+                            p1Score += rating.CalculateRating();
+                        }
+                        else if (color == 2)
+                        {
+                            var rating = new Rating(_board);
+                            rating.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
+                            p2ExistingAnswers += rating.GetExistingAnswers();
+
+                            var rating2 = new Rating(_board);
+                            rating2.FeedRating(row, col, 1, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
+                            p2Score += rating2.CalculateRating();
+                        }
+                        #endregion
+                    }
+                    else
+                    {
+                        #region ThirdHeuristic
+                        sbyte color = _board[row][col];
+                        if (color == 0) break;
+                        else if (color == 1)
+                        {
+                            var rating = new Rating(_board);
+                            rating.FeedRating(row, col, color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
+
+                            var rating2 = new Rating(_board);
+                            rating2.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
+
+                            p1Score += rating.CalculateRating() - rating2.CalculateRating();
+                            p1ExistingAnswers += rating.GetExistingAnswers();
+                        }
+                        else if (color == 2)
+                        {
+                            var rating = new Rating(_board);
+                            rating.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
+
+                            var rating2 = new Rating(_board);
+                            rating2.FeedRating(row, col, color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
+
+                            p2Score += rating.CalculateRating() - -rating2.CalculateRating();
+                            p2ExistingAnswers += rating.GetExistingAnswers();
+                        }
+
+                        #endregion
                     }
                 }
             }
@@ -147,6 +208,8 @@ namespace SIConnectFour
 
         public GameBoard(GameBoard bs)
         {
+            _p1H = bs._p1H;
+            _p2H = bs._p2H;
             _board = bs._board.Select(a => a.ToArray()).ToArray(); // Deep copy
 
             _player = bs._player;

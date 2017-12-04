@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,11 +24,13 @@ namespace SIConnectFourGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int LookAhead = 6;
+        private int LookAheadP1 = 6;
+        private int LookAheadP2 = 6;
         private SolidColorBrush Color_Background;
         private SolidColorBrush Color_Player1;
         private SolidColorBrush Color_Player2;
         private SolidColorBrush Color_Empty;
+        private SolidColorBrush Color_Hover;
         private GameBoard GameBoard;
 
         public MainWindow()
@@ -38,8 +41,13 @@ namespace SIConnectFourGUI
             Color_Empty = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFFFFF")); // White
             Color_Player1 = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FF0000")); // Red
             Color_Player2 = (SolidColorBrush)(new BrushConverter().ConvertFrom("#0000FF")); // Blue
+            Color_Hover = (SolidColorBrush)(new BrushConverter().ConvertFrom("#C0C0C0")); // Silver
 
-            GameBoard = new GameBoard(Constant.ROWSIZE, Constant.COLUMNSIZE);
+            GameBoard = new GameBoard(Constant.ROWSIZE, Constant.COLUMNSIZE)
+            {
+                _p1H = cbP1H.SelectedIndex,
+                _p2H = cbP2H.SelectedIndex
+            };
             GameBoard.PlayerMoved += GameBoard_PlayerMoved;
 
         }
@@ -53,6 +61,11 @@ namespace SIConnectFourGUI
             // Sets color and removes events
             SetColor(disc, (player ? 1 : 2));
             RemoveEvents(disc);
+
+            if (cbPlayType.SelectedIndex == 1)
+            {
+                Grid_GameBoard.Measure(new Size(505,254));
+            }
 
             if (GameBoard.Player1ExistingAnswers > 0)
             {
@@ -83,8 +96,11 @@ namespace SIConnectFourGUI
                 return;
             }
 
-            if (GameBoard.Player != Player.P1) // Computer's turn
-                GameBoard.MakeMove(MinMax.FindBestMove(GameBoard, LookAhead, GameBoard.Player == Player.P2), GameBoard.Player);
+            if ( GameBoard.Player != Player.P1) // Computer's turn
+            {
+                GameBoard.MakeMove(MinMax.FindBestMove(GameBoard, GameBoard.Player == Player.P1 ? LookAheadP1 : LookAheadP2, GameBoard.Player == Player.P2),
+                    GameBoard.Player);
+            }
         }
 
         private Ellipse GetDisc(Position pos)
@@ -101,11 +117,11 @@ namespace SIConnectFourGUI
         private void Grid_GameBoard_Loaded(object sender, RoutedEventArgs e)
         {
             GameBoard.Reset();
-            
+
             Grid_GameBoard.RowDefinitions.Clear();
             Grid_GameBoard.ColumnDefinitions.Clear();
             Grid_GameBoard.Children.Clear();
-            
+
             for (int row = 0; row < Constant.ROWSIZE; row++)
             {
                 Grid_GameBoard.RowDefinitions.Add(new RowDefinition());
@@ -114,24 +130,23 @@ namespace SIConnectFourGUI
                 {
                     if (row == 0)
                         Grid_GameBoard.ColumnDefinitions.Add(new ColumnDefinition()); // Sets column defintion
-                    
+
                     Ellipse disc = new Ellipse();
+                    disc.Height = 40;
+                    disc.Width = 40;
                     disc.Fill = Color_Empty; // Sets color to empty
                     disc.Tag = new Position(row, col);
-                    
+
                     Grid.SetRow(disc, row);
                     Grid.SetColumn(disc, col);
-                    
+
                     disc.MouseEnter += Disc_MouseEnter;
                     disc.MouseLeave += Disc_MouseLeave;
                     disc.MouseLeftButtonUp += Disc_MouseLeftButtonUp;
-                    
+
                     Grid_GameBoard.Children.Add(disc);
                 }
             }
-            
-            Grid_GameBoard.ContextMenu = Grid_GameBoard.Resources["ContextMenu_Options"] as ContextMenu;
-            
         }
 
         private void Disc_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -140,8 +155,13 @@ namespace SIConnectFourGUI
 
             Ellipse disc = sender as Ellipse;
             Position pos = disc.Tag as Position;
-
-            GameBoard.MakeMove(pos.Column, Player.P1);
+            if(cbPlayType.SelectedIndex == 0)
+                GameBoard.MakeMove(pos.Column, Player.P1);
+            else
+            {
+                GameBoard.MakeMove(MinMax.FindBestMove(GameBoard, GameBoard.Player == Player.P1 ? LookAheadP1 : LookAheadP2, GameBoard.Player == Player.P2),
+                    GameBoard.Player);
+            }
         }
 
         private void SetColor(Ellipse disc, int color)
@@ -158,6 +178,9 @@ namespace SIConnectFourGUI
                     break;
                 case 2:
                     disc.Fill = Color_Player2;
+                    break;
+                case 3:
+                    disc.Fill = Color_Hover;
                     break;
             }
         }
@@ -185,33 +208,24 @@ namespace SIConnectFourGUI
             if (!(sender is Ellipse)) return;
 
             // Sets to player color
-            SetColor(sender as Ellipse, 1);
+            SetColor(sender as Ellipse, 3);
         }
 
-        private void Button_Reset_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             Grid_GameBoard_Loaded(sender, e);
-        }
-
-        private void Button_Exit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void Window_KeyUp(object sender, KeyEventArgs e)
-        {
-            switch (e.Key)
+            if (cbPlayType.SelectedIndex == 0)
             {
-                case Key.R:
-                    // Resets board
-                    Grid_GameBoard_Loaded(sender, e);
-                    break;
-                case Key.X:
-                case Key.Q:
-                case Key.Escape:
-                    // Quits application
-                    this.Close();
-                    break;
+                Grid_GameBoard.IsEnabled = true;
+                GameBoard._p2H = cbP2H.SelectedIndex;
+            }
+            else
+            {
+                Grid_GameBoard.IsEnabled = true;
+                GameBoard._p1H = cbP1H.SelectedIndex;
+                GameBoard._p2H = cbP2H.SelectedIndex;
+                GameBoard.MakeMove(MinMax.FindBestMove(GameBoard, GameBoard.Player == Player.P1 ? LookAheadP1 : LookAheadP2, GameBoard.Player == Player.P2),
+                    GameBoard.Player);
             }
         }
     }
