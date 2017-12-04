@@ -72,7 +72,7 @@ namespace SIConnectFour
             _player = (_player == Player.P1)?Player.P2:Player.P1;
             
             _estimation = CalculateRating(out _p1ExistingAnswers, out _p2ExistingAnswers);
-            OnPlayerMove(new Position(row, column), player);
+            OnPlayerMove(new Position(row, column), _player);
 
             return row;
         }
@@ -102,7 +102,7 @@ namespace SIConnectFour
                     else if (color == 1)
                     {
                         var rating = new Rating(_board);
-                        rating.FeedRating(row,col,color,p1Horizontals,p1Verticals, p1DiagonalsLeft,p1DiagonalsRight);
+                        rating.FeedRating(row,col,color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
                         
                         p1Score += rating.CalculateRating();
                         p1ExistingAnswers = rating.GetExistingAnswers();
@@ -110,7 +110,7 @@ namespace SIConnectFour
                     else if (color == 2)
                     {
                         var rating = new Rating(_board);
-                        rating.FeedRating(row, col, color, p2Horizontals, p2Verticals, p2DiagonalsLeft, p2DiagonalsRight);
+                        rating.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
                         
                         p2Score += rating.CalculateRating();
                         p2ExistingAnswers = rating.GetExistingAnswers();

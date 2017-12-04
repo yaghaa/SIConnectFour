@@ -23,7 +23,7 @@ namespace SIConnectFourGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int LookAhead = 3;
+        private int LookAhead = 6;
         private SolidColorBrush Color_Background;
         private SolidColorBrush Color_Player1;
         private SolidColorBrush Color_Player2;
@@ -51,7 +51,7 @@ namespace SIConnectFourGUI
             if (disc == null) return;
 
             // Sets color and removes events
-            SetColor(disc, (player ? 2 : 1));
+            SetColor(disc, (player ? 1 : 2));
             RemoveEvents(disc);
 
             if (GameBoard.Player1ExistingAnswers > 0)
@@ -84,7 +84,7 @@ namespace SIConnectFourGUI
             }
 
             if (GameBoard.Player != Player.P1) // Computer's turn
-                GameBoard.MakeMove(MinMax.FindBestMove(GameBoard, LookAhead, GameBoard.Player == Player.P1), GameBoard.Player);
+                GameBoard.MakeMove(MinMax.FindBestMove(GameBoard, LookAhead, GameBoard.Player == Player.P2), GameBoard.Player);
         }
 
         private Ellipse GetDisc(Position pos)

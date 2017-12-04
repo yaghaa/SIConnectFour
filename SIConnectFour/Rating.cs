@@ -19,15 +19,15 @@ namespace SIConnectFour
             _board = board;
         }
 
-        public void FeedRating(int row, int col, sbyte color, List<Position> p1Horizontals, List<Position> p1Verticals, List<Position> p1DiagonalsLeft, List<Position> p1DiagonalsRight)
+        public void FeedRating(int row, int col, sbyte color, ref List<Position> p1Horizontals, ref List<Position> p1Verticals, ref List<Position> p1DiagonalsLeft, ref List<Position> p1DiagonalsRight)
         {
-            HorizontalScore(row, col, color, p1Horizontals);
-            VerticalScore(row, col, color, p1Verticals);
-            DiagonalScoreLeft(row, col, color, p1DiagonalsLeft);
-            DiagonalScoreRight(row, col, color, p1DiagonalsRight);
+            HorizontalScore(row, col, color, ref p1Horizontals);
+            VerticalScore(row, col, color, ref p1Verticals);
+            DiagonalScoreLeft(row, col, color, ref p1DiagonalsLeft);
+            DiagonalScoreRight(row, col, color, ref p1DiagonalsRight);
         }
 
-        private void DiagonalScoreLeft(int row, int col, sbyte color,List<Position> previous)
+        private void DiagonalScoreLeft(int row, int col, sbyte color, ref List<Position> previous)
         {
             dSolutionsLeft = 0;
             
@@ -64,7 +64,7 @@ namespace SIConnectFour
             }
         }
 
-        private void DiagonalScoreRight(int row, int col, sbyte color, List<Position> previous)
+        private void DiagonalScoreRight(int row, int col, sbyte color, ref List<Position> previous)
         {
             dSolutionsRight = 0;
             
@@ -101,7 +101,7 @@ namespace SIConnectFour
             }
         }
 
-        private void HorizontalScore(int row, int col, sbyte color, List<Position> previous)
+        private void HorizontalScore(int row, int col, sbyte color, ref List<Position> previous)
         {
             hSolutions = 0;
             
@@ -117,6 +117,7 @@ namespace SIConnectFour
                     if (!WithinBounds(pos)) break;
 
                     sbyte selDisc = _board[row][startCol + ii];
+
                     if (!(selDisc == 0 || selDisc == color) || previous.Contains(pos)) break;
                     
                     if (selDisc == color) runningScore++;
@@ -137,7 +138,7 @@ namespace SIConnectFour
             }
         }
 
-        private void VerticalScore(int row, int col, sbyte color, List<Position> previous)
+        private void VerticalScore(int row, int col, sbyte color, ref List<Position> previous)
         {
             vSolutions = 0;
             
