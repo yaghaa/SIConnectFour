@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,8 @@ namespace SIConnectFourGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private List<TimeSpan> MoveTimesP1;
+        private List<TimeSpan> MoveTimesP2;
         private int LookAheadP1 = 6;
         private int LookAheadP2 = 6;
         private SolidColorBrush Color_Background;
@@ -35,6 +38,8 @@ namespace SIConnectFourGUI
 
         public MainWindow()
         {
+            MoveTimesP2 = new List<TimeSpan>();
+            MoveTimesP1 = new List<TimeSpan>();
             InitializeComponent();
 
             Color_Background = (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFD1D136")); // Yellow
@@ -69,8 +74,10 @@ namespace SIConnectFourGUI
 
             if (GameBoard.Player1ExistingAnswers > 0)
             {
+                var P1Median = Median(MoveTimesP1);
+                var P2Median = Median(MoveTimesP2);
                 // Player 1 wins!
-                MessageBox.Show("Player 1 wins!");
+                MessageBox.Show($"Player 1 wins! \nŚredni czas ruchu P1: {P1Median}\nŚredni czas ruchu P2: {P2Median}");
 
                 foreach (var child in Grid_GameBoard.Children)
                 {
@@ -83,8 +90,10 @@ namespace SIConnectFourGUI
             }
             else if (GameBoard.Player2ExistingAnswers > 0)
             {
+                var P1Median = Median(MoveTimesP1);
+                var P2Median = Median(MoveTimesP2);
                 // Player 2 wins!
-                MessageBox.Show("Computer wins!");
+                MessageBox.Show($"Player 2 wins! \nŚredni czas ruchu P1: {P1Median}\nŚredni czas ruchu P2: {P2Median}");
 
                 foreach (var child in Grid_GameBoard.Children)
                 {
@@ -96,11 +105,45 @@ namespace SIConnectFourGUI
                 return;
             }
 
+            if (GameBoard.GetAvailableMoves().Count == 0)
+            {
+                var P1Median = Median(MoveTimesP1);
+                var P2Median = Median(MoveTimesP2);
+                // Player 2 wins!
+                MessageBox.Show($"Draw! \nŚredni czas ruchu P1: {P1Median}\nŚredni czas ruchu P2: {P2Median}");
+            }
+
             if ( GameBoard.Player != Player.P1) // Computer's turn
             {
+                var sw = new Stopwatch();
+                sw.Start();
                 GameBoard.MakeMove(MinMax.FindBestMove(GameBoard, GameBoard.Player == Player.P1 ? LookAheadP1 : LookAheadP2, GameBoard.Player == Player.P2),
                     GameBoard.Player);
+                sw.Stop();
+                
+                MoveTimesP2.Add(sw.Elapsed);
             }
+        }
+
+        public double Median(List<TimeSpan> ts)
+        {
+            ts.Sort();
+
+            var n = ts.Count;
+
+            double median;
+
+            var isOdd = n % 2 != 0;
+            if (isOdd)
+            {
+                median = ts[(n + 1) / 2 - 1].TotalMilliseconds;
+            }
+            else
+            {
+                median = (ts[n / 2 - 1].TotalMilliseconds + ts[n / 2].TotalMilliseconds) / 2.0d;
+            }
+
+            return median;
         }
 
         private Ellipse GetDisc(Position pos)
@@ -159,8 +202,13 @@ namespace SIConnectFourGUI
                 GameBoard.MakeMove(pos.Column, Player.P1);
             else
             {
+                var sw2 = new Stopwatch();
+                sw2.Start();
                 GameBoard.MakeMove(MinMax.FindBestMove(GameBoard, GameBoard.Player == Player.P1 ? LookAheadP1 : LookAheadP2, GameBoard.Player == Player.P2),
                     GameBoard.Player);
+                sw2.Stop();
+
+                MoveTimesP1.Add(sw2.Elapsed);
             }
         }
 
@@ -224,8 +272,14 @@ namespace SIConnectFourGUI
                 Grid_GameBoard.IsEnabled = true;
                 GameBoard._p1H = cbP1H.SelectedIndex;
                 GameBoard._p2H = cbP2H.SelectedIndex;
+
+                var sw2 = new Stopwatch();
+                sw2.Start();
                 GameBoard.MakeMove(MinMax.FindBestMove(GameBoard, GameBoard.Player == Player.P1 ? LookAheadP1 : LookAheadP2, GameBoard.Player == Player.P2),
                     GameBoard.Player);
+                sw2.Stop();
+
+                MoveTimesP1.Add(sw2.Elapsed);
             }
         }
     }

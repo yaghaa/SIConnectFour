@@ -119,33 +119,33 @@ namespace SIConnectFour
                             p2Score += rating.CalculateRating();
                             p2ExistingAnswers += rating.GetExistingAnswers();
                         }
-                        #endregion
+                        
                     }
+                    #endregion
+                    #region SecondHeuristic
                     else if ((Player == Player.P1 && _p1H == 1) || (Player == Player.P2 && _p2H == 1))
                     {
-                        #region SecondHeuristic
+                        
                         sbyte color = _board[row][col];
                         if (color == 0) break;
                         else if (color == 1)
                         {
                             var rating = new Rating(_board);
                             rating.FeedRating(row, col, color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
-                            p1ExistingAnswers += rating.GetExistingAnswers();
 
-                            p1Score += rating.CalculateRating();
+                            p1Score += rating.CalculateRating2();
+                            p1ExistingAnswers += rating.GetExistingAnswers();
                         }
                         else if (color == 2)
                         {
                             var rating = new Rating(_board);
                             rating.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
-                            p2ExistingAnswers += rating.GetExistingAnswers();
 
-                            var rating2 = new Rating(_board);
-                            rating2.FeedRating(row, col, 1, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
-                            p2Score += rating2.CalculateRating();
+                            p2Score += rating.CalculateRating2();
+                            p2ExistingAnswers += rating.GetExistingAnswers();
                         }
-                        #endregion
                     }
+                    #endregion
                     else
                     {
                         #region ThirdHeuristic

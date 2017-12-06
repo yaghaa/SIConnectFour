@@ -221,5 +221,40 @@ namespace SIConnectFour
 
             return 0;
         }
+
+        public int CalculateRating2()
+        {
+            var rating = 0;
+            rating += CalculateValue2(HorizontalsInRow);
+            rating += CalculateValue2(VerticalsInRow);
+            rating += CalculateValue2(DiagonalsRightInRow);
+            rating += CalculateValue2(DiagonalsLeftInRow);
+            return rating;
+        }
+
+        private int CalculateValue2(int value)
+        {
+            if (value == 1)
+            {
+                return 9;
+            }
+
+            if (value == 2)
+            {
+                return 3;
+            }
+
+            if (value == 3)
+            {
+                return 1;
+            }
+
+            if (value == 4)
+            {
+                return 27;
+            }
+
+            return 0;
+        }
     }
 }

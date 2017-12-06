@@ -43,7 +43,7 @@ namespace SIConnectFour
         private static int AlphaBeta2(GameBoard bs, int depth, int alpha, int beta, bool maxPlayer, out int bestMove)
         {
             List<int> moves = bs.GetAvailableMoves();
-            bestMove = moves.First();
+            bestMove = moves.FirstOrDefault();
 
             
             if (depth == 0 || bs.Player1ExistingAnswers > 0
