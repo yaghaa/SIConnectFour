@@ -187,7 +187,7 @@ namespace SIConnectFour
             return vSolutions + hSolutions + dSolutionsLeft + dSolutionsRight;
         }
 
-        public int CalculateRating()
+        public int CalculatePionts()
         {
             var rating = 0;
             rating += CalculateValue(HorizontalsInRow);
@@ -222,7 +222,7 @@ namespace SIConnectFour
             return 0;
         }
 
-        public int CalculateRating2()
+        public int CalculatePoints2()
         {
             var rating = 0;
             rating += CalculateValue2(HorizontalsInRow);

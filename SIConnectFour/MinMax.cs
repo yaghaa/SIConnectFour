@@ -5,7 +5,7 @@ namespace SIConnectFour
 {
     public class MinMax
     {
-        public static List<GameBoard> GetNextStates(GameBoard bs, bool maxPlayer)
+        public static List<GameBoard> GetNextStates(GameBoard bs, bool isMaxPlayer)
         {
             List<int> moves = bs.GetAvailableMoves();
             List<GameBoard> states = new List<GameBoard>();
@@ -18,7 +18,7 @@ namespace SIConnectFour
                 states.Add(nextState);
             }
             
-            if (maxPlayer)
+            if (isMaxPlayer)
             {
                 states.Sort((a, b) => b.Estimation - a.Estimation);
             }
@@ -40,7 +40,7 @@ namespace SIConnectFour
             return bestMoveIndex;
         }
 
-        private static int AlphaBeta2(GameBoard bs, int depth, int alpha, int beta, bool maxPlayer, out int bestMove)
+        private static int AlphaBeta2(GameBoard bs, int depth, int alpha, int beta, bool isMaxPlayer, out int bestMove)
         {
             List<int> moves = bs.GetAvailableMoves();
             bestMove = moves.FirstOrDefault();
@@ -52,9 +52,9 @@ namespace SIConnectFour
                 return bs.Estimation;
             }
 
-            List<GameBoard> nextStates = GetNextStates(bs, maxPlayer);
+            List<GameBoard> nextStates = GetNextStates(bs, isMaxPlayer);
 
-            if (maxPlayer)
+            if (isMaxPlayer)
             {
                 foreach (GameBoard nextState in nextStates)
                 {

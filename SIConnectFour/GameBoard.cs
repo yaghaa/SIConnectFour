@@ -108,7 +108,7 @@ namespace SIConnectFour
                             var rating = new Rating(_board);
                             rating.FeedRating(row, col, color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
 
-                            p1Score += rating.CalculateRating();
+                            p1Score += rating.CalculatePionts();
                             p1ExistingAnswers += rating.GetExistingAnswers();
                         }
                         else if (color == 2)
@@ -116,7 +116,7 @@ namespace SIConnectFour
                             var rating = new Rating(_board);
                             rating.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
 
-                            p2Score += rating.CalculateRating();
+                            p2Score += rating.CalculatePionts();
                             p2ExistingAnswers += rating.GetExistingAnswers();
                         }
                         
@@ -133,7 +133,7 @@ namespace SIConnectFour
                             var rating = new Rating(_board);
                             rating.FeedRating(row, col, color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
 
-                            p1Score += rating.CalculateRating2();
+                            p1Score += rating.CalculatePoints2();
                             p1ExistingAnswers += rating.GetExistingAnswers();
                         }
                         else if (color == 2)
@@ -141,25 +141,31 @@ namespace SIConnectFour
                             var rating = new Rating(_board);
                             rating.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
 
-                            p2Score += rating.CalculateRating2();
+                            p2Score += rating.CalculatePoints2();
                             p2ExistingAnswers += rating.GetExistingAnswers();
                         }
                     }
                     #endregion
-                    else
+
+                    #region ThirdHeuristic
+                    else if ((Player == Player.P1 && _p1H == 2) || (Player == Player.P2 && _p2H == 2))
                     {
-                        #region ThirdHeuristic
+
                         sbyte color = _board[row][col];
                         if (color == 0) break;
                         else if (color == 1)
                         {
                             var rating = new Rating(_board);
                             rating.FeedRating(row, col, color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
+                            if (Player == Player.P1)
+                            {
 
-                            var rating2 = new Rating(_board);
-                            rating2.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
-
-                            p1Score += rating.CalculateRating() - rating2.CalculateRating();
+                                p1Score += rating.CalculatePoints2();
+                            }
+                            else
+                            {
+                                p1Score += rating.CalculatePionts();
+                            }
                             p1ExistingAnswers += rating.GetExistingAnswers();
                         }
                         else if (color == 2)
@@ -167,15 +173,19 @@ namespace SIConnectFour
                             var rating = new Rating(_board);
                             rating.FeedRating(row, col, color, ref p2Horizontals, ref p2Verticals, ref p2DiagonalsLeft, ref p2DiagonalsRight);
 
-                            var rating2 = new Rating(_board);
-                            rating2.FeedRating(row, col, color, ref p1Horizontals, ref p1Verticals, ref p1DiagonalsLeft, ref p1DiagonalsRight);
+                            if (Player == Player.P2)
+                            {
 
-                            p2Score += rating.CalculateRating() - -rating2.CalculateRating();
+                                p2Score += rating.CalculatePoints2();
+                            }
+                            else
+                            {
+                                p2Score += rating.CalculatePionts();
+                            }
                             p2ExistingAnswers += rating.GetExistingAnswers();
                         }
-
-                        #endregion
                     }
+                    #endregion
                 }
             }
 
@@ -193,7 +203,7 @@ namespace SIConnectFour
             _lastMove = position.Column;
 
             MoveHandler handler = PlayerMoved;
-            if (handler == null) return; // No subscribers
+            if (handler == null) return; 
 
             handler(position, player == Player.P1);
         }
